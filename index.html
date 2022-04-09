@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    	<meta charset="utf-8">
+    	<meta name="description" content="This is where your description goes">
+    	<meta name="keywords" content="one, two, three">
+
+		<title>Find you a drank.</title>
+		<!-- FontAwesome -->
+		<script src="https://kit.fontawesome.com/c7867bb742.js" crossorigin="anonymous"></script>
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"> 
+		<!-- external CSS link -->
+		<link rel="stylesheet" href="css/normalize.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<header>
+			<h1>Find you a drank.</h1>
+			<p>Type in an ingredient.</p>
+			<input type="text" name="" value="">
+			<button type="button" id="get-cocktails" name="button">Get Cocktails</button>
+
+			<section class="results hidden" id="results">
+				<h2>Choose a cocktail</h2>
+				<button type="button" name="random" id="random-choice">Surprise me.</button>
+				<ul class="cocktail-results"></ul>
+			</section>
+			<footer>
+				<ul class="socials">
+					<li><a href="https://twitter.com/jetsuko_"><i class="fa-brands fa-twitter"></i>@jetsuko_</a></li>
+					<li><a href="https://github.com/jetsuko"><i class="fa-brands fa-github"></i>@jetsuko</a></li>
+				</ul>
+			</footer>
+		</header>
+		
+		<article class="drink-choice hidden" id="drink-choice">
+			<img src="" alt="">
+			<h2>Name</h2>
+			<h3 id="ingredients">Ingredients</h3>
+			<ul id="ingredients-list"></ul>
+			<h3>Instructions</h3>
+			<p id="instructions"></p>
+		</article>
+
+		<script type="text/javascript" src="js/main.js"></script>
+	</body>
+</html>
