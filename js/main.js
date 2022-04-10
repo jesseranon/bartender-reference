@@ -1,88 +1,137 @@
-//The user will enter a cocktail. Get a cocktail name, photo, and instructions and place them in the DOM
-const RESULTS_SECTION = document.querySelector('#results');
-const RESULTS_LIST = document.querySelector('.cocktail-results');
-const DRINK_CHOICE = document.querySelector('#drink-choice');
-let currentDrinkSelection,
-    currentChoiceNumber;
+const BASE_URL = "https://acnhapi.com/v1a",
+  PERSONALITIES = ['Jock', 'Peppy', 'Snooty', 'Cranky', 'Lazy', 'Normal', 'Uchi', 'Smug'].sort(),
+  MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  CHAR_CODE = 65,
+  DETAILS = Array.from(document.querySelectorAll('details')),
+  ALPHABET = [],
+  SPECIES = [],
+  VILLAGERS = [],
+  listPairs = [[SPECIES, `#species-list`], [ALPHABET, `#alphabet-list`], [PERSONALITIES, `#personalities-list`], [MONTHS, `#months-list`]];
 
-// 
-document.querySelector("#get-cocktails").addEventListener('click', e => {
-    let ingredient = document.querySelector("input").value;
-    
-    fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${ingredient}`)
-    .then(res => res.json())
-    .then(data => displayCocktailList(data))
-    .catch(err => {
-        console.log(`err ${err}`);
+// too lazy to make an alphabet array by hand
+for (let i = CHAR_CODE; i < CHAR_CODE + 26; i++) {
+  ALPHABET.push(String.fromCharCode(i));
+}
+
+fetch(`${BASE_URL}/villagers`)
+  .then(data => data.json())
+  .then(json => {
+    json.forEach(obj => VILLAGERS.push(obj));
+    setSpeciesList(VILLAGERS);
+    listPairs.forEach(pair => {
+      [list, parentId] = pair;
+      setListLinks(list, parentId);
+    });
+  })
+  .catch(err => {
+    console.log(`err: ${err}`);
+  });
+
+  console.log(VILLAGERS);
+
+// when the user chooses a category from the list, it populates the sub-category list.
+// when the user chooses a name from the sub-category list, it generates a villager passport
+
+function setSpeciesList(arr) {
+  arr.map(v => v.species)
+    .filter((species, i, arr) => {
+      if (i === arr.indexOf(species)) return species;
     })
+    .forEach(species => SPECIES.push(species));
+}
+
+function setListLinks(arr, parentId) {
+  let parentUl = document.querySelector(`${parentId}`)
+  let res = '';
+  for (let i = 0; i < arr.length; i++) {
+    res += createListItem(arr[i]);
+  }
+  parentUl.innerHTML = res;
+  addLinkEventListeners(parentId);
+}
+
+function addLinkEventListeners(parentId) {
+  let links = Array.from(document.querySelectorAll(`${parentId} a`));
+  links.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      advanceSelection(e.currentTarget);
+    })
+  });
+}
+
+function advanceSelection(c) {
+  let names = getFilteredNames(c.innerText);
+  let res = '';
+  if (names.length > 1) {
+    const namesParent = document.querySelector('#filtered-names');
+    names.forEach(villager => {
+      res += createListItem(villager.name["name-USen"]);
+    });
+    namesParent.innerHTML = res; 
+    addLinkEventListeners(`#filtered-names`);
+  } else {
+    const villager = names[0];
+    setPassportDiv(villager);
+  }
+}
+
+function createListItem(val) {
+  return `<li><a href="#">${val}</a></li>`;
+}
+
+function getFilteredNames(s) {
+  let res;
+  if (SPECIES.includes(s)) {
+    res = villagersFilter('species', s);
+  } else if (PERSONALITIES.includes(s)) {
+    res = villagersFilter('personality', s);
+  } else if (MONTHS.includes(s)) {
+    res = villagersFilter('birthday-string', s);
+  } else {
+    res = villagersFilter('name', s);
+  }
+  return res;
+}
+
+function villagersFilter(prop, val) {
+  switch (prop) {
+    case 'name':
+      if (val.length === 1) {
+        return VILLAGERS.filter(villager => {
+          return villager.name["name-USen"][0] === val;
+        });
+      } else {
+        return VILLAGERS.filter(villager => {
+          return villager.name["name-USen"] === val;
+        });
+      }
+    case 'birthday-string':
+      return VILLAGERS.filter(villager => {
+        return villager["birthday-string"].split(' ')[0] === val;
+      });
+    default:
+      return VILLAGERS.filter(villager => {
+        return villager[prop] === val;
+      });
+  }  
+}
+
+function setPassportDiv(villager) {
+  const passportParent = document.querySelector('#villager-passport');
+  passportParent.querySelector('#villager-name').innerText = villager.name["name-USen"];
+  passportParent.querySelector('#villager-pic').src = villager["image_uri"];
+  passportParent.querySelector('#villager-birthdate').innerText = villager["birthday-string"];
+  passportParent.querySelector('#villager-personality').innerText = villager.personality;
+  passportParent.querySelector('#villager-saying').innerText = villager.saying;
+  passportParent.classList.remove('hidden');
+}
+
+// close details that are not the last one clicked.
+DETAILS.forEach(d => {
+  d.addEventListener('click', e => {
+    DETAILS.forEach(detail => {
+      if (detail !== d) detail.removeAttribute('open');
+    })
+  });
 });
-
-// display list of choices
-function displayCocktailList(d) {
-    currentDrinkSelection = d;
-    console.log(currentDrinkSelection);
-    RESULTS_LIST.innerHTML = "";
-    d.drinks.forEach(c => {
-        RESULTS_LIST.innerHTML += `<li><a href="#">${c.strDrink}</a></li>`;
-    });
-    const links = Array.from(document.querySelectorAll('a'));
-    currentChoiceNumber = links.length;
-    links.forEach(a => a.addEventListener('click', fetchCocktail));
-    RESULTS_SECTION.classList.remove('hidden');
-}
-
-// choose a random cocktail
-document.querySelector("#random-choice").addEventListener('click', fetchCocktail);
-
-function fetchCocktail(e) {
-    e.preventDefault();
-    console.log(e);
-    let current;
-    if (e.target.innerText === "Surprise me.") {
-        let randomNum = Math.floor(Math.random() * currentChoiceNumber);
-        current = currentDrinkSelection.drinks[randomNum].strDrink;
-    } else current = e.target.innerText;
-
-    fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${current}`)
-    .then(res => res.json())
-    .then(data => {
-        displayCocktail(data);
-    })
-    .catch(err => {
-        console.log(`err: ${err}`);
-    });
-}
-
-function displayCocktail(d, i = 0) {
-    const drink = d.drinks[i],
-        ingredientList = getIngredients(drink),
-        h2 = document.querySelector('#drink-choice h2'),
-        img = document.querySelector('#drink-choice img'),
-        ingredients = document.querySelector('#ingredients-list'),
-        instructions = document.querySelector('#instructions');
-    h2.innerText = drink.strDrink;
-    img.src = drink.strDrinkThumb;
-    instructions.innerText = drink.strInstructions;
-    ingredients.innerHTML = ingredientList;
-    DRINK_CHOICE.classList.remove('hidden');
-}
-
-function getIngredients(d) {
-    const ingredientKeys = Object.keys(d)
-                            .map(i => {
-                                if (i.includes('Ingredient')) return i;
-                            })
-                            .filter(i => {
-                                if (d[i] !== null && d[i] !== "") return i;
-                            });
-    let res = '';
-    for (let i = 0; i < ingredientKeys.length; i++) {
-        let currentKey = ingredientKeys[i];
-        let number = currentKey.slice(currentKey.lastIndexOf('t') + 1);
-        let ingredientName = d[currentKey];
-        let ingredientMeasure = d[`strMeasure${number}`];
-        if (ingredientMeasure === null) ingredientMeasure = "";
-        res += `<li>${ingredientMeasure} ${ingredientName}</li>`;
-    }
-    return res;
-}
