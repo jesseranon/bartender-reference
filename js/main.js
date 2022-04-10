@@ -42,7 +42,7 @@ function fetchCocktail(e) {
         let randomNum = Math.floor(Math.random() * currentChoiceNumber);
         current = currentDrinkSelection.drinks[randomNum].strDrink;
     } else current = e.target.innerText;
-    console.log(current);
+
     fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${current}`)
     .then(res => res.json())
     .then(data => {
@@ -54,10 +54,8 @@ function fetchCocktail(e) {
 }
 
 function displayCocktail(d, i = 0) {
-    console.log(d);
-    const drink = d.drinks[i];
-    console.log(drink);
-    const ingredientList = getIngredients(drink),
+    const drink = d.drinks[i],
+        ingredientList = getIngredients(drink),
         h2 = document.querySelector('#drink-choice h2'),
         img = document.querySelector('#drink-choice img'),
         ingredients = document.querySelector('#ingredients-list'),
