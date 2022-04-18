@@ -25,7 +25,7 @@
 
 			<section class="results hidden" id="results">
 				<h2>Choose a cocktail</h2>
-				<button type="button" name="random" id="random-choice">Surprise me.</button>
+				<button type="button" name="random" id="random-cocktail">Surprise me.</button>
 				<ul class="cocktail-results"></ul>
 			</section>
 			<footer>
@@ -35,15 +35,23 @@
 				</ul>
 			</footer>
 		</header>
-		
-		<article class="drink-choice hidden" id="drink-choice">
-			<img src="" alt="">
-			<h2>Name</h2>
-			<h3 id="ingredients">Ingredients</h3>
-			<ul id="ingredients-list"></ul>
-			<h3>Instructions</h3>
-			<p id="instructions"></p>
-		</article>
+		<section class="carousel">
+			
+			<button class="carousel__button carousel__button--left is-hidden">
+				<img src="img/left.svg" alt="previous">
+			</button>
+
+			<div class="carousel__track-container">
+				<ul class="carousel__track"></ul>
+			</div>
+
+			<button class="carousel__button carousel__button--right">
+				<img src="img/right.svg" alt="next recipe">
+			</button>
+
+			<div class="carousel__nav"></div>
+
+		</section>
 
 		<script type="text/javascript" src="js/main.js"></script>
 	</body>
