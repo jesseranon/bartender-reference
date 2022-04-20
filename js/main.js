@@ -50,6 +50,7 @@ class App {
             this.renderCocktailList(this.current, 'results');
             this.renderSkeletonCards(this.current);
             this.fetchCocktail(this.current[0].strDrink);
+            this.hideShowCarouselButtons(0);
         });
         // random cocktail function
         document.querySelector("#random-cocktail").addEventListener('click', async e => {

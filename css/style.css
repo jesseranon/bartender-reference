@@ -164,11 +164,11 @@ footer {
 }
 
 .carousel__button--left {
-  left: -40px;
+  left: -4rem;
 }
 
 .carousel__button--right {
-  right: -40px;
+  right: -4rem;
 }
 
 .carousel__button img {
