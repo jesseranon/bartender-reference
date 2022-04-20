@@ -33,8 +33,9 @@ a, a:visited {
   color: inherit;
 }
 
-a:hover {
-  color: orange;
+a:hover,
+a:active {
+  color: dodgerblue;
 }
 
 ul {
