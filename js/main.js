@@ -49,6 +49,11 @@ class App {
             // render search results
             this.renderCocktailList(this.current, 'results');
             this.renderSkeletonCards(this.current);
+            const track = this.carouselTrack;
+            const slides = Array.from(this.carouselTrack.children);
+            const currentSlide = track.querySelector('.current-slide');
+            const targetSlide = slides[0]
+            this.moveToSlide(currentSlide, targetSlide);
             this.fetchCocktail(this.current[0].strDrink);
             this.hideShowCarouselButtons(0);
         });
