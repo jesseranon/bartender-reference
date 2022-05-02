@@ -10,19 +10,42 @@
 /******************************************
 /* BASE ELEMENTS
 /*******************************************/
+
+:root {
+  --default-background: black;
+  --default-font-color: white;
+  --card-background: white;
+  --card-font-color: black;
+}
+
 body {
   font-family: 'PT Serif', serif;
-  background-color: #cafdff;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  background-color: var(--default-background);
   gap: calc(50% - 20rem);
-  overflow: hidden;
+  height: 100vh;
+  position: relative;
+  background: url('../img/alan-shaw-fKmPyx4J9e0-unsplash.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: var(--default-font-color);
+  position: relative;
+}
+
+h3,
+h2,
+h1,
+p {
+  margin: 0;
 }
 
 img{
   display: block;
   margin: 0 auto;
+}
+
+i {
+  color: black;
+  font-size: 1.5rem;
 }
 
 a {
@@ -35,7 +58,7 @@ a, a:visited {
 
 a:hover,
 a:active {
-  color: dodgerblue;
+  color: inherit;
 }
 
 ul {
@@ -43,7 +66,7 @@ ul {
   padding: 0;
   margin: 0;
 }
-
+/* 
 header {
   position: relative;
   width: 20rem;
@@ -54,33 +77,86 @@ header {
 
 header > * {
   max-width: 100%;
+} */
+
+h1 {
+  text-align: center;
 }
 
-input, button {
+input,
+button {
   margin: .5rem auto;
   width: 80%;
+  height: 2rem;
+  border: 1px solid white;
+  border-radius: 0;
 }
 
 button {
-  border-radius: 2px;
+  background-color: black;
+  color: white;
 }
 
-.hidden {
-  display: none;
+i {
+  color: var(--default-font-color);
 }
 
-ul.socials {
-  position: absolute;
-  bottom: 1rem;
-  left: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+footer,
+.socials {
   width: 100%;
 }
 
-footer {
-  height: auto;
+ul.socials {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.flex-column {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.flex-row {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-row > * {
+  flex-basis: 50%;
+}
+
+.flex-search {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+
+input {
+  flex-basis: 90%;
+}
+
+.get-cocktails {
+  flex-basis: 10%;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  background-color: rgba(0,0,0,.8);
+  z-index: 9999;
+  overflow: auto;
+  justify-content: flex-start;
+  padding: 5vh 5vw;
 }
 
 /******************************************
@@ -96,12 +172,18 @@ footer {
   height: 50vh;
 } */
 
+/*****************************************
+/* RESULTS LIST
+******************************************/
+
 .cocktail-results {
-  min-height: 20vh;
-  max-height: 55vh;
+  padding: 1rem 5vw;
   display: flex;
-  flex-flow: column nowrap;
-  overflow-y: auto;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 5px;
 }
 
 
@@ -109,6 +191,59 @@ footer {
   list-style: square;
   margin-left: 2rem;
 }
+
+.slide-link {
+  background-color: var(--card-background);
+  border-radius: 5px;
+  color: var(--card-font-color);
+  min-height: 3.5rem;
+  width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  cursor: pointer;
+}
+
+.slide-link > * {
+  margin: 0;
+}
+
+.drink-thumb {
+  height: 3rem;
+  object-fit: contain;
+}
+
+.lightbox {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  background: rgba(0, 0, 0, .8);
+}
+
+@media (min-width: 30rem) {
+  .slide-link {
+    min-width: 10rem;
+    min-height: 10rem;
+    width: 30%;
+    padding: 1rem;
+    flex-direction: column;
+  }
+
+  .drink-thumb {
+    height: 8rem;
+  }
+}
+
+/*****************************************
+/* RESULTS END
+******************************************/
+
 
 /*****************************************
 /* CAROUSEL
@@ -220,14 +355,43 @@ footer {
   padding: 2rem;
   border-radius: 5px;
   background-color: white;
-  height: 100%;
+  color: var(--card-font-color);
+  height: 90%;
+  width: 90%;
+  max-width: 30rem;
+  position: relative;
+  overflow-y: auto;
+  justify-content: flex-start;
 }
 
-.cocktail-recipe > img {
+.cocktail-recipe .flex-column {
+  align-items: center;
+}
+
+h2[data-name] {
+  width: 50%;
+  text-align: center;
+}
+
+.cocktail-recipe img {
   height: 10rem;
   width: 10rem;
   margin: 1rem auto;
   border-radius: 50%;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: 2rem;
+  margin-right: 2.5rem;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.close i {
+  color: black;
 }
 
 /****************************************
@@ -276,7 +440,7 @@ footer {
 
 @keyframes skeleton-loading {
   0% {
-    background-color: hsl(200, 20%, 70%);
+    background-color: hsl(200, 20%, 50%);
   }
 
   100% {
@@ -291,3 +455,8 @@ footer {
 /******************************************
 /* ADDITIONAL STYLES
 /*******************************************/
+
+.hidden {
+  display: none;
+}
+

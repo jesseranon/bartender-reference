@@ -4,8 +4,8 @@
     	<meta charset="utf-8">
     	<meta name="description" content="This is where your description goes">
     	<meta name="keywords" content="one, two, three">
-
-		<title>Find you a drank.</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>The Vegas Bartender's Pocket Reference</title>
 		<!-- FontAwesome -->
 		<script src="https://kit.fontawesome.com/c7867bb742.js" crossorigin="anonymous"></script>
 		<!-- Google Fonts -->
@@ -17,68 +17,95 @@
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-		<header>
-			<h1>Find you a drank.</h1>
-			<p>Type in an ingredient.</p>
-			<input type="text" name="" value="">
-			<button type="button" id="get-cocktails" name="button">Get Cocktails</button>
-
-			<section class="results hidden" id="results">
-				<h2>Choose a cocktail</h2>
-				<button type="button" name="random" id="random-cocktail">Surprise me.</button>
+		<div class="flex-column overlay">
+			<header class="flex-column">
+				<h1>The Vegas Bartender's Pocket Reference</h1>
+				<label for="filter">Type in a(n)</label>
+				<select name="filter" id="filter">
+					<option value="drink-name">drink name</option>
+					<option value="ingredient">ingredient</option>
+				</select>
+				<div class="flex-search">
+					<input type="text" name="" value="">
+					<button type="button" class="get-cocktails" id="get-cocktails" name="button"><i class="fa-solid fa-magnifying-glass"></i></button>
+					<button type="button" class="surprise-me" id="surprise-me" name="button">"Surprise Me"</button>
+				</div>
+			</header>
+			
+			<section class="results hidden flex-column" id="results">
 				<ul class="cocktail-results"></ul>
 			</section>
-			<footer>
-				<ul class="socials">
-					<li><a href="https://twitter.com/jetsuko_"><i class="fa-brands fa-twitter"></i>@jetsuko_</a></li>
-					<li><a href="https://github.com/jetsuko"><i class="fa-brands fa-github"></i>@jetsuko</a></li>
-				</ul>
-			</footer>
-		</header>
-		<section class="carousel">
+	
+			<section class="lightbox hidden flex-column">
+				<article class="cocktail-recipe flex-column">
+					<div class="close"><i class="fa-solid fa-xmark"></i></i></div>
+					<h2 data-name>
+						<div class="skeleton skeleton-text skeleton-header skeleton-name"></div>
+					</h2>
+					<p data-glass></p>
+					<img src="" alt="" class="skeleton">
+					<h3 class="ingredients-title"></h3>
+					<ul data-ingredients></ul>
+					<h3 class="instructions-title"></h3>
+					<p data-instructions></p>
+				</article>
+			</section>
+				
 			
-			<button class="carousel__button carousel__button--left is-hidden">
-				<img src="img/left.svg" alt="previous">
-			</button>
-
-			<div class="carousel__track-container">
-				<ul class="carousel__track">
-				<!-- SKELETON TEMPLATE
-					<li class="carousel__slide">
-						<article class="cocktail-recipe">
-							<img src="" alt="" class="skeleton">
-							<h2 data-name>
-								<div class="skeleton skeleton-text skeleton-header skeleton-name"></div>
-							</h2>
-							<h3 class="ingredients-title">
-								<div class="skeleton skeleton-text skeleton-header"></div>
-							</h3>
-							<ul data-ingredients>
-								<li class="skeleton skeleton-text skeleton-ingredient"></li>
-								<li class="skeleton skeleton-text skeleton-ingredient"></li>
-								<li class="skeleton skeleton-text skeleton-ingredient"></li>
-							</ul>
-							<h3 class="instructions-title">
-								<div class="skeleton skeleton-text skeleton-header"></div>
-							</h3>
-							<p data-instructions>
-								<div class="skeleton skeleton-text"></div>
-								<div class="skeleton skeleton-text"></div>
-								<div class="skeleton skeleton-text"></div>
-							</p>
-						</article>
-					</li> 
-				-->
+			<!-- <section class="carousel hidden">
+				
+				<button class="carousel__button carousel__button--left is-hidden">
+					<img src="img/left.svg" alt="previous">
+				</button>
+	
+				<div class="carousel__track-container">
+					<ul class="carousel__track">
+					SKELETON TEMPLATE
+						<li class="carousel__slide">
+							<article class="cocktail-recipe">
+								<img src="" alt="" class="skeleton">
+								<h2 data-name>
+									<div class="skeleton skeleton-text skeleton-header skeleton-name"></div>
+								</h2>
+								<h3 class="ingredients-title">
+									<div class="skeleton skeleton-text skeleton-header"></div>
+								</h3>
+								<ul data-ingredients>
+									<li class="skeleton skeleton-text skeleton-ingredient"></li>
+									<li class="skeleton skeleton-text skeleton-ingredient"></li>
+									<li class="skeleton skeleton-text skeleton-ingredient"></li>
+								</ul>
+								<h3 class="instructions-title">
+									<div class="skeleton skeleton-text skeleton-header"></div>
+								</h3>
+								<p data-instructions>
+									<div class="skeleton skeleton-text"></div>
+									<div class="skeleton skeleton-text"></div>
+									<div class="skeleton skeleton-text"></div>
+								</p>
+							</article>
+						</li> 
+	
+					</ul>
+				</div>
+	
+				<button class="carousel__button carousel__button--right is-hidden">
+					<img src="img/right.svg" alt="next recipe">
+				</button>
+	
+				<div class="carousel__nav"></div>
+	
+			</section> -->
+	
+			<footer class="flex-column">
+				<ul class="socials">
+					<li><a href="https://github.com/jesseranon"><i class="fa-brands fa-github"></i>@JesseRanon</a></li>
 				</ul>
-			</div>
-
-			<button class="carousel__button carousel__button--right is-hidden">
-				<img src="img/right.svg" alt="next recipe">
-			</button>
-
-			<div class="carousel__nav"></div>
-
-		</section>
+				<p>
+					Photo by <a href="https://unsplash.com/@alanshaw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Alan Shaw</a> on <a href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+				</p>
+			</footer>
+		</div>
 
 		<script type="text/javascript" src="js/main.js"></script>
 	</body>

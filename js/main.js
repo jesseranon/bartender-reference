@@ -2,6 +2,10 @@
 const RESULTS_SECTION = document.querySelector('#results');
 const RESULTS_LIST = document.querySelector('.cocktail-results');
 const DRINK_CHOICE = document.querySelector('.container');
+const BUTTONS = Array.from(document.querySelectorAll('button'));
+const CLOSE = document.querySelector('.close');
+const FILTER = document.querySelector('#filter');
+const LIGHTBOX = document.querySelector('.lightbox');
 let currentDrinkSelection,
     currentChoiceNumber;
 
@@ -10,16 +14,47 @@ document.addEventListener('DOMContentLoaded', appInit);
 async function appInit() {
     let app = new App();
     await app.init();
-    
+    CLOSE.addEventListener('click', e => {
+        LIGHTBOX.classList.add('hidden');
+    });
 }
+
+/*
+NEW SPECS
+1. search by drink name
+2. listen for changes in search input
+3. populate list area with results drink names include search string
+-- if search string is blank, no results are shown
+-- if no names match the search string, display `no results for ${search string}`
+-- if only one result, shows recipe card
+4. clicking on a name pops up a lightbox with the full recipe card
+5. lightbox is a carousel
+6. a surprise me button for the customer that says "surprise me"
+7. a button/dropdown to search by ingredients for a customer that know what they want but doesn't know what they want.
+
+
+SKELETON = DETAILS/SUMMARY FORMAT??
+
+RECIPE CARD
+1. NAME (.strDrink)
+2. PICTURE (.strDrinkThumb)
+3. GLASS (.strGlass)
+4. INGREDIENTS (.strMeasure## .strIngredient##)
+5. INSTRUCTIONS (.strInstructions)
+6. VIDEO (link if .strVideo available)
+-- Video will pop up an iFrame that auto plays the video
+
+LIGHTBOX
+*/
 
 // display list of choices
 class App {
     constructor() {
-        this.searches = {};
+        this.baseApiUrl = `https://www.thecocktaildb.com/api/json/v1/1`;
         this.cards = {};
         this.current = [];
         this.currentIndex = 0;
+        this.lightbox = document.querySelector('.lightbox');
         this.carouselTrack = document.querySelector('.carousel__track');
         this.carouselNav = document.querySelector('.carousel__nav');
         this.prevSlideButton = document.querySelector('.carousel__button--left');
@@ -37,57 +72,61 @@ class App {
     }
 
     async init() {
+        RESULTS_LIST.addEventListener('click', async e => {
+            const drinkName = e.target.closest('li');
+            if (!drinkName) return;
+            await this.fetchCocktail(drinkName.id);
+        });
+        document.addEventListener('keydown', async e => {
+            if (e.key === 'Enter') await this.runSearch();
+        });
         // set click event for button on search function
         document.querySelector("#get-cocktails").addEventListener('click', async () => {
-            let ingredient = document.querySelector("input").value;
-            if (!(`${ingredient}` in this.searches)) {
-                let data = await this.getFetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${ingredient}`);
-                this.searches[ingredient] = data.drinks;
-            }
-            this.current = this.searches[ingredient];
-            // console.log(this.current);
-            // render search results
-            this.renderCocktailList(this.current, 'results');
-            this.renderSkeletonCards(this.current);
-            const track = this.carouselTrack;
-            const slides = Array.from(this.carouselTrack.children);
-            const currentSlide = track.querySelector('.current-slide');
-            const targetSlide = slides[0]
-            await this.moveToSlide(currentSlide, targetSlide);
-            this.fetchCocktail(this.current[0].strDrink);
-            this.hideShowCarouselButtons(0);
+            await this.runSearch();
         });
         // random cocktail function
-        document.querySelector("#random-cocktail").addEventListener('click', async e => {
-            // //fetch a random cocktail from search results
-            const track = this.carouselTrack;
-            const slides = Array.from(this.carouselTrack.children);
-            const currentSlide = track.querySelector('.current-slide');
-            const drinkIndex = Math.floor(Math.random() * this.current.length);
-            const targetSlide = slides[drinkIndex];
-            await this.moveToSlide(currentSlide, targetSlide);
-            this.hideShowCarouselButtons(drinkIndex);
+        document.querySelector("#surprise-me").addEventListener('click', async e => {
+            //e.target.id;
         });
-        //add event listener to prevButton
-        this.prevSlideButton.addEventListener('click', e => {
-            const track = this.carouselTrack;
-            const slides = Array.from(this.carouselTrack.children);
-            const currentSlide = track.querySelector('.current-slide');
-            const prevSlide = currentSlide.previousElementSibling;
-            const prevIndex = slides.findIndex(slide => slide === prevSlide);
-            this.moveToSlide(currentSlide, prevSlide);
-            this.hideShowCarouselButtons(prevIndex);
-        })
-        //add event listener to nextButton
-        this.nextSlideButton.addEventListener('click', e => {
-            const track = this.carouselTrack;
-            const slides = Array.from(this.carouselTrack.children);
-            const currentSlide = track.querySelector('.current-slide');
-            const nextSlide = currentSlide.nextElementSibling;
-            const nextIndex = slides.findIndex(slide => slide === nextSlide);
-            this.moveToSlide(currentSlide, nextSlide);
-            this.hideShowCarouselButtons(nextIndex);
-        });
+        // //add event listener to prevButton
+        // this.prevSlideButton.addEventListener('click', e => {
+        //     const track = this.carouselTrack;
+        //     const slides = Array.from(this.carouselTrack.children);
+        //     const currentSlide = track.querySelector('.current-slide');
+        //     const prevSlide = currentSlide.previousElementSibling;
+        //     const prevIndex = slides.findIndex(slide => slide === prevSlide);
+        //     this.moveToSlide(currentSlide, prevSlide);
+        //     this.hideShowCarouselButtons(prevIndex);
+        // })
+        // //add event listener to nextButton
+        // this.nextSlideButton.addEventListener('click', e => {
+        //     const track = this.carouselTrack;
+        //     const slides = Array.from(this.carouselTrack.children);
+        //     const currentSlide = track.querySelector('.current-slide');
+        //     const nextSlide = currentSlide.nextElementSibling;
+        //     const nextIndex = slides.findIndex(slide => slide === nextSlide);
+        //     this.moveToSlide(currentSlide, nextSlide);
+        //     this.hideShowCarouselButtons(nextIndex);
+        // });
+    }
+
+    async runSearch() {
+        let input = document.querySelector("input").value;
+        let filter = FILTER.value;
+        let query;
+        if (filter === 'ingredient') query = `filter.php?i`;
+        else if (filter === 'drink-name') query = `search.php?s`;
+        let fullQueryUrl = `${this.baseApiUrl}/${query}=${input}`;
+
+        let data = await this.getFetch(fullQueryUrl);
+        // data.drinks.forEach(drink => {
+        //     let name = drink.strDrink;
+        //     if (!(`${name}` in this.cards)) this.cards[name] = drink;
+        // });
+        // console.log(this.cards);
+        this.current = data.drinks;
+        console.log(this.current);
+        this.renderCocktailList(this.current, 'results');
     }
 
     /**
@@ -95,52 +134,32 @@ class App {
      * calls addLinkListeners on the created links
      * unhides results section if it's hidden
      * **/
-    renderCocktailList(arr, parentId) {
+    renderCocktailList(arr) {
         // currentDrinkSelection = data;
         // console.log(currentDrinkSelection);
         RESULTS_LIST.innerHTML = "";
         arr.forEach((c, i) => {
             const li = document.createElement('li');
             li.classList.add('slide-link');
+            li.id = c.idDrink;
             if (i === 0) li.classList.add('current-slide');
-            const link = document.createElement('a');
-            link.setAttribute('href', '#');
-            link.textContent = c.strDrink;
-            li.appendChild(link);
+            const drinkName = document.createElement('p');
+            drinkName.textContent = c.strDrink;
+            const img = document.createElement('img');
+            img.classList.add('skeleton', 'drink-thumb');
+            img.src = c.strDrinkThumb;
+            [drinkName, img].forEach(el => {
+                li.appendChild(el);
+            })
             RESULTS_LIST.appendChild(li);
         });
-        this.addLinkListeners(parentId);
         if (RESULTS_SECTION.classList.contains('hidden')) {
             RESULTS_SECTION.classList.remove('hidden');
         }
     }
 
-    /** NEED TO RE-WORK EVENT LISTENER
-     * collects all links in parentId
-     * adds a click listener that calls fetchCocktail
-     * fetchCocktail uses the link's inner text
-     * **/
-    addLinkListeners(parentId) {
-        
-        const links = Array.from(document.querySelectorAll(`#${parentId} a`));
-        const resultsList = document.querySelector('.cocktail-results');
-
-        // currentChoiceNumber = links.length;
-        links.forEach(a => a.addEventListener('click', async e => {
-            e.preventDefault();
-            // console.log(e.target.innerText);
-            // console.log(resultsList);
-            const currentSlide = this.carouselTrack.querySelector('.current-slide');
-            const links = Array.from(resultsList.children).map(li => li.children[0]);
-            const slides = Array.from(this.carouselTrack.children)
-            const targetIndex = links.findIndex(listItem => listItem === e.target);
-            const targetSlide = slides[targetIndex];
-            // console.log(targetSlide);
-
-            this.moveToSlide(currentSlide, targetSlide);
-            this.hideShowCarouselButtons(targetIndex);
-            this.fetchCocktail(e.target.innerText);
-        }));
+    displayError() {
+        // displays an error if getFetch doesn't work
     }
 
     /**
@@ -158,17 +177,21 @@ class App {
         let fetch;
         if (!this.cards[str]) {
             let drinkIndex;
-            if (str === "Surprise me.") {
-                drinkIndex = Math.floor(Math.random() * this.current.length);    
+            if (str === "surprise-me") {
+                if (this.current.length === 0) {
+
+                } else {
+                    drinkIndex = Math.floor(Math.random() * this.current.length);
+                }   
             } else {
-                drinkIndex = this.current.findIndex(drink => drink.strDrink === str);
+                drinkIndex = this.current.findIndex(drink => drink.idDrink === str);
             }
             this.currentIndex = drinkIndex;
-            fetch = this.current[drinkIndex].strDrink;
+            fetch = this.current[drinkIndex].idDrink;
             if (!(`${fetch}` in this.cards)) {
-                const data = await this.getFetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${fetch}`);
+                const data = await this.getFetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${fetch}`);
                 const drink = data.drinks[0];
-                this.cards[drink.strDrink] = data.drinks[0];
+                this.cards[drink.idDrink] = data.drinks[0];
             }
         }
         this.renderCocktailRecipe(this.cards[str]);
@@ -238,98 +261,114 @@ class App {
 
     }
     
-    /****
-     * Render skeleton card for recipes
-     * append skeleton card to carousel__track
-     ****/
-    renderSkeletonCard(str) {
-        //helper function for adding skeleton text to an element
-        const appendSkeleText = (parent, child) => {
-            for (let i = 1; i <= 3; i++) {
-                parent.appendChild(child)
-            }
-        }
+    // /****
+    //  * Render skeleton card for recipes
+    //  * append skeleton card to carousel__track
+    //  ****/
+    // renderSkeletonCard(str) {
+    //     //helper function for adding skeleton text to an element
+    //     const appendSkeleText = (parent, child) => {
+    //         for (let i = 1; i <= 3; i++) {
+    //             parent.appendChild(child)
+    //         }
+    //     }
 
-        //create containing item list
-        const listItem = document.createElement('li');
-        listItem.classList.add('carousel__slide');
+    //     //create containing item list
+    //     const listItem = document.createElement('li');
+    //     listItem.classList.add('carousel__slide');
 
-        //create article
-        const card = document.createElement('article');
-        card.classList.add('cocktail-recipe');
-        card.setAttribute('id', str);
+    //     //create article
+    //     const card = document.createElement('article');
+    //     card.classList.add('cocktail-recipe');
+    //     card.setAttribute('id', str);
 
-        //create img
-        const img = document.createElement('img');
-        img.classList.add('skeleton');
+    //     //create img
+    //     const img = document.createElement('img');
+    //     img.classList.add('skeleton');
 
-        //create name title
-        const nameTitle = document.createElement('h2');
-        nameTitle.setAttribute('data-name', true);
-        const nameTitleSkel = document.createElement('div');
-        nameTitleSkel.classList.add('skeleton', 'skeleton-header', 'skeleton-name');
-        nameTitle.appendChild(nameTitleSkel);
+    //     //create name title
+    //     const nameTitle = document.createElement('h2');
+    //     nameTitle.setAttribute('data-name', true);
+    //     const nameTitleSkel = document.createElement('div');
+    //     nameTitleSkel.classList.add('skeleton', 'skeleton-header', 'skeleton-name');
+    //     nameTitle.appendChild(nameTitleSkel);
 
-        //create ingredients
-        ////title
-        const ingredientsTitle = document.createElement('h3');
-        ingredientsTitle.classList.add('ingredients-title');
-        const ingredientsTitleSkel = document.createElement('div');
-        ingredientsTitleSkel.classList.add('skeleton', 'skeleton-header');
-        ingredientsTitle.appendChild(ingredientsTitleSkel);
-        ////ingredients list
-        const ingredientsList = document.createElement('ul');
-        ingredientsList.setAttribute('data-ingredients', true);
-        //create skeleton list items for ingredientsList
-        const ingredientItem = document.createElement('li');
-        ingredientItem.classList.add('skeleton', 'skeleton-text', 'skeleton-ingredient');
-        appendSkeleText(ingredientsList, ingredientItem);
+    //     const glassTitle = document.createElement('h3');
+    //     glassTitle.classList.add('glass-title');
+    //     const glassTitleSkel = document.createElement('div');
+    //     glassTitleSkel.classList.add('skeleton', 'skeleton-header');
+    //     const glassText = document.createElement('p');
+    //     glassText.setAttribute('data-glass', true);
+    //     const glassTextSkel = document.createElement('div');
+    //     glassTextSkel.classList.add('skeleton', 'skeleton-text');
+    //     glassTitle.appendChild(glassTitleSkel);
+    //     glassText.appendChild(glassTextSkel);
 
-        //create instructions
-        ////title
-        const instructionsTitle = document.createElement('h3');
-        instructionsTitle.classList.add('instructions-title');
-        const instructionsTitleSkel = document.createElement('div');
-        instructionsTitleSkel.classList.add('skeleton', 'skeleton-header');
-        instructionsTitle.appendChild(instructionsTitleSkel);
-        ////text
-        const instructionsText = document.createElement('p');
-        instructionsText.setAttribute('data-instructions', true);
-        //create skeleton text for instructionsText
-        const skeletonText = document.createElement('div');
-        skeletonText.classList.add('skeleton', 'skeleton-text');
-        appendSkeleText(instructionsText, skeletonText);
+
+    //     //create ingredients
+    //     ////title
+    //     const ingredientsTitle = document.createElement('h3');
+    //     ingredientsTitle.classList.add('ingredients-title');
+    //     const ingredientsTitleSkel = document.createElement('div');
+    //     ingredientsTitleSkel.classList.add('skeleton', 'skeleton-header');
+    //     ingredientsTitle.appendChild(ingredientsTitleSkel);
+    //     ////ingredients list
+    //     const ingredientsList = document.createElement('ul');
+    //     ingredientsList.setAttribute('data-ingredients', true);
+    //     //create skeleton list items for ingredientsList
+    //     const ingredientItem = document.createElement('li');
+    //     ingredientItem.classList.add('skeleton', 'skeleton-text', 'skeleton-ingredient');
+    //     appendSkeleText(ingredientsList, ingredientItem);
+
+    //     //create instructions
+    //     ////title
+    //     const instructionsTitle = document.createElement('h3');
+    //     instructionsTitle.classList.add('instructions-title');
+    //     const instructionsTitleSkel = document.createElement('div');
+    //     instructionsTitleSkel.classList.add('skeleton', 'skeleton-header');
+    //     instructionsTitle.appendChild(instructionsTitleSkel);
+    //     ////text
+    //     const instructionsText = document.createElement('p');
+    //     instructionsText.setAttribute('data-instructions', true);
+    //     //create skeleton text for instructionsText
+    //     const skeletonText = document.createElement('div');
+    //     skeletonText.classList.add('skeleton', 'skeleton-text');
+    //     appendSkeleText(instructionsText, skeletonText);
         
-        //append elements to article
-        const elements = [
-            img, 
-            nameTitle, 
-            ingredientsTitle, 
-            ingredientsList, 
-            instructionsTitle, 
-            instructionsText
-        ];
-        elements.forEach(el => {
-            card.appendChild(el);
-        });
+    //     //append elements to article
+    //     const elements = [
+    //         img, 
+    //         nameTitle,
+    //         glassTitle,
+    //         glassText,
+    //         ingredientsTitle, 
+    //         ingredientsList, 
+    //         instructionsTitle, 
+    //         instructionsText
+    //     ];
+    //     elements.forEach(el => {
+    //         card.appendChild(el);
+    //     });
 
-        //append article to list item
-        listItem.appendChild(card);
+    //     //append article to list item
+    //     listItem.appendChild(card);
 
-        //append list item to carousel track    
-        this.carouselTrack.appendChild(listItem);
-    }
+    //     //append list item to carousel track    
+    //     target.appendChild(listItem);
+    // }
 
-     /**
+    /**
      * finds article/cocktail-recipe by id
      * fetches cocktail info
      * renders cocktail info to 
      * **/
-      renderCocktailRecipe(obj) {
+    renderCocktailRecipe(obj) {
+        let target = this.lightbox;
         // console.log(obj);
-        const card = this.carouselTrack.querySelector(`article[id="${obj.strDrink}"]`);
+        const card = target.querySelector('.cocktail-recipe');
         const img = card.querySelector('img');
         const name = card.querySelector('[data-name]');
+        const glass = card.querySelector('[data-glass]');
         const ingredientsTitle = card.querySelector('.ingredients-title');
         const ingredients = card.querySelector('[data-ingredients]');
         const instructionsTitle = card.querySelector('.instructions-title');
@@ -341,14 +380,18 @@ class App {
         //name
         name.textContent = obj.strDrink;
 
+        //glass
+        glass.textContent = obj.strGlass;
+
         //ingredients
         ingredientsTitle.textContent = 'Ingredients';
-        ingredients.textContent = '';
         this.getIngredients(obj, ingredients);
 
         //instructions
         instructionsTitle.textContent = 'Instructions';
         instructions.textContent = obj.strInstructions;
+
+        if (target.classList.contains('hidden')) target.classList.remove('hidden');
     }
 
     /**
@@ -357,7 +400,7 @@ class App {
      * list item is a string that shows measurement for the ingredient and the ingredient's name
      * appends each list item to parentElement.
      * **/
-     getIngredients(obj, parentElement) {
+    getIngredients(obj, parentElement) {
         const ingredientKeys = Object.keys(obj)
         .map(i => {
             if (i.includes('Ingredient')) return i;
