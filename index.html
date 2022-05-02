@@ -38,16 +38,20 @@
 	
 			<section class="lightbox hidden flex-column">
 				<article class="cocktail-recipe flex-column">
-					<div class="close"><i class="fa-solid fa-xmark"></i></i></div>
 					<h2 data-name>
 						<div class="skeleton skeleton-text skeleton-header skeleton-name"></div>
 					</h2>
 					<p data-glass></p>
 					<img src="" alt="" class="skeleton">
-					<h3 class="ingredients-title"></h3>
-					<ul data-ingredients></ul>
-					<h3 class="instructions-title"></h3>
-					<p data-instructions></p>
+					<div class="flex-column space-btw">
+						<div class="cocktail-text flex-column">
+							<h3 class="ingredients-title"></h3>
+							<ul data-ingredients class="flex-column"></ul>
+							<h3 class="instructions-title"></h3>
+							<p data-instructions></p>
+						</div>
+						<button type="button" id="close" class="close">Close</button>
+					</div>
 				</article>
 			</section>
 				
@@ -99,7 +103,7 @@
 	
 			<footer class="flex-column">
 				<ul class="socials">
-					<li><a href="https://github.com/jesseranon"><i class="fa-brands fa-github"></i>@JesseRanon</a></li>
+					<li><a href="https://github.com/jesseranon"><i class="fa-brands fa-github"></i>@Jetsuko</a></li>
 				</ul>
 				<p>
 					Photo by <a href="https://unsplash.com/@alanshaw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Alan Shaw</a> on <a href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>

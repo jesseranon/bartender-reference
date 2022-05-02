@@ -17,6 +17,10 @@ async function appInit() {
     CLOSE.addEventListener('click', e => {
         LIGHTBOX.classList.add('hidden');
     });
+    LIGHTBOX.addEventListener('click', e => {
+        if (e.target !== e.currentTarget) return;
+        LIGHTBOX.classList.add('hidden');
+    });
 }
 
 /*
@@ -86,7 +90,10 @@ class App {
         });
         // random cocktail function
         document.querySelector("#surprise-me").addEventListener('click', async e => {
-            //e.target.id;
+            const aCharCode = 97;
+            const letterCode = Math.floor(Math.random() * 26) + 97;
+            await this.runSearch(String.fromCharCode(letterCode));
+            await this.fetchCocktail(e.target.id);
         });
         // //add event listener to prevButton
         // this.prevSlideButton.addEventListener('click', e => {
@@ -110,10 +117,19 @@ class App {
         // });
     }
 
-    async runSearch() {
-        let input = document.querySelector("input").value;
-        let filter = FILTER.value;
-        let query;
+    async runSearch(str = "") {
+        let input,
+            filter,
+            query;
+        if (!str) {
+            input = document.querySelector("input").value;
+            filter = FILTER.value;
+        }
+        else {
+            input = str;
+            filter = 'drink-name';
+        }
+
         if (filter === 'ingredient') query = `filter.php?i`;
         else if (filter === 'drink-name') query = `search.php?s`;
         let fullQueryUrl = `${this.baseApiUrl}/${query}=${input}`;
@@ -125,7 +141,6 @@ class App {
         // });
         // console.log(this.cards);
         this.current = data.drinks;
-        console.log(this.current);
         this.renderCocktailList(this.current, 'results');
     }
 
@@ -178,23 +193,19 @@ class App {
         if (!this.cards[str]) {
             let drinkIndex;
             if (str === "surprise-me") {
-                if (this.current.length === 0) {
-
-                } else {
-                    drinkIndex = Math.floor(Math.random() * this.current.length);
-                }   
-            } else {
+                drinkIndex = Math.floor(Math.random() * this.current.length);            } else {
                 drinkIndex = this.current.findIndex(drink => drink.idDrink === str);
             }
             this.currentIndex = drinkIndex;
             fetch = this.current[drinkIndex].idDrink;
             if (!(`${fetch}` in this.cards)) {
-                const data = await this.getFetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${fetch}`);
+                const fetchUrl = `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${fetch}`;
+                const data = await this.getFetch(fetchUrl);
                 const drink = data.drinks[0];
-                this.cards[drink.idDrink] = data.drinks[0];
+                this.cards[drink.idDrink] = drink;
             }
-        }
-        this.renderCocktailRecipe(this.cards[str]);
+        } else fetch = str;
+        this.renderCocktailRecipe(this.cards[fetch]);
     }
 
     /**
@@ -408,6 +419,9 @@ class App {
         .filter(i => {
             if (obj[i] !== null && obj[i] !== "") return i;
         });
+        while (parentElement.firstChild) {
+            parentElement.removeChild(parentElement.firstChild);
+        }
         for (let i = 0; i < ingredientKeys.length; i++) {
             let currentKey = ingredientKeys[i];
             let number = currentKey.slice(currentKey.lastIndexOf('t') + 1);
@@ -415,7 +429,11 @@ class App {
             let ingredientMeasure = obj[`strMeasure${number}`];
             if (ingredientMeasure === null) ingredientMeasure = "";
             const li = document.createElement('li');
-            li.textContent = `${ingredientMeasure} ${ingredientName}`;
+            if (ingredientMeasure.includes('to taste')) {
+                li.textContent = `${ingredientName} ${ingredientMeasure}`;
+            } else {
+                li.textContent = `${ingredientMeasure} ${ingredientName}`;
+            }
             parentElement.appendChild(li);
         }
     }
