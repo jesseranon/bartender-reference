@@ -1,7 +1,7 @@
 # The Vegas Bartender's Pocket Reference
 This app provides a quick reference for making drinks by providing recipes by drink name.  Users are also able to search for drinks by ingredient, or pull up a random recipe by clicking on the, "Surprise Me" button.
 
-**Link to project:** http://recruiters-love-seeing-live-demos.com/
+**Link to project:** https://vegasbartenderreference.netlify.app/
 
 ![alt tag](http://placecorgi.com/1200/650)
 
