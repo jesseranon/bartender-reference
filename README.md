@@ -1,5 +1,5 @@
-# My Awesome Project
-Write a short sentence or two about this project and what it does. Be sure to include a link and a screenshot (we're front end devs so we can actually see our work!).
+# The Vegas Bartender's Pocket Reference
+This app provides a quick reference for making drinks by providing recipes by drink name.  Users are also able to search for drinks by ingredient, or pull up a random recipe by clicking on the, "Surprise Me" button.
 
 **Link to project:** http://recruiters-love-seeing-live-demos.com/
 
