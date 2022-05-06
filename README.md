@@ -3,7 +3,7 @@ This app provides a quick reference for making drinks by providing recipes by dr
 
 **Link to project:** https://vegasbartenderreference.netlify.app/
 
-<img width="1278" alt="bartenders guide" src="https://user-images.githubusercontent.com/5935095/166842963-13288bbe-f58e-42fb-a12c-e341eea057a3.png">
+<img width="1274" alt="bartenders guide" src="https://user-images.githubusercontent.com/5935095/167164406-24d65de7-46b3-4b87-b808-d79a41e4463d.png">
 
 ## How It's Made:
 
