@@ -6,19 +6,16 @@ This app provides a quick reference for making drinks by providing recipes by dr
 <img width="1274" alt="bartenders guide" src="https://user-images.githubusercontent.com/5935095/167164406-24d65de7-46b3-4b87-b808-d79a41e4463d.png">
 
 ## How It's Made:
-<hr />
 
 **Tech used:** HTML, CSS, JavaScript
 
 This site uses cocktailDB API calls to get information for drinks and displays options in an easy-to-access format. The bartender can then click any option to display the recipe and instructions for how to make the drink.
 
 ## Optimizations
-<hr />
 
 With some extra time I would refactor this to MVC structure and implement a favorites collection that would provide the user quick access to their favorite/most-mixed drinks.  I would also like to implement a carousel so that the user can swipe/click through recipes.
 
 ## Lessons Learned:
-<hr />
 
 Design decisions definitely affect the aesthetics and useability of an app. This app originally displayed results in a carousel instead of a list.  This made the results a lot more difficult to access, as the emphasis was on the carousel itself, rather than having access to a list of options to make a choice.
 
